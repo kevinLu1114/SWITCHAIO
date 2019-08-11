@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>{{profile['d_name']}}</title>
+    {% block ref %}
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/css/bootstrap4-toggle.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/js/bootstrap4-toggle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/switch_control.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% endblock ref %}
+{% endblock head %}
+
+{% block body %}
+
+    {% if state %}
+        <h1>請去IOTTalk做連線</h1>
+        <h2>d_name {{profile['d_name']}}</h2>
+        <h2>dm_name {{profile['dm_name']}}</h2>
+    {% else %}
+        {% block switch %}
+        <form>
+        <fieldset>
+            <legend >SWITCH狀態</legend>
+            <input type="checkbox" checked data-toggle="toggle" data-size="lg" id='switch'>
+        </fieldset>
+        </form>
+        {% endblock switch %}
+
+        {% block HT %}
+            <table class="table table-bordered table-dark" style="width:30%">
+                <thead>
+                  <tr>
+                    <th scope="col" colspan='2'>即時顯示</th>
+                  </tr>
+                  <tr>
+                    <th scope="col">Humidity</th>
+                    <th scope="col">Temperature</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                        <td scope="row-3" id ='Humidity1-O'>None</td>
+                        <td scope="row-3" id ='Temperature1-O'>None</td>
+                  </tr>
+                </tbody>
+              </table>
+            <table class="table table-bordered table-dark" style="width:30%">
+                
+                <tr>
+                    <th scope="col-3">Humidity</th>
+                    <th scope="col-3">Temperature</th>
+                </tr>
+                <tr>
+                    <td scope="row-3" id ='Humidity1-O'>None</td>
+                    <td scope="row-3" id ='Temperature1-O'>None</td>
+                </tr>
+            </table>
+        {% endblock HT %}
+
+        {% block Time_control %}
+        <form class="form-inline" action="{{ url_for('') }}" method="POST">
+            <table class="table table-bordered table-dark" style="width:30%">
+                    <tr>
+                        <th scope="col-3">時間控制</th>
+                        <th scope="col-3">小時</th>
+                        <th scope="col-3">分鐘</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            開始時間
+                        </td>
+                        <td>
+                            <select class="form-control" name='start_hour'>
+                            {% for hour in range(1, 24) %}
+                                <option value={{hour}}>{{hour}}</option>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <select class="form-control" name='start_min'>
+                            {% for min in range(1, 60) %}
+                                <option value={{min}}>{{min}}</option>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            結束時間
+                        </td>
+                        <td>
+                            <select class="form-control" name='end_hour'>
+                            {% for hour in range(1, 24) %}
+                                <option value={{hour}}>{{hour}}</option>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <select class="form-control" name='end_min'>
+                            {% for min in range(1, 60) %}
+                                <option value={{min}}>{{min}}</option>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan='3'>
+                            <input type="submit" class="btn btn-primary" value="更改">
+                        </td>
+                    </tr>
+            </table>
+        </form>
+        {% endblock Time_control %}
+
+        {% block HT_control %}
+            <legend >Humidity控制</legend>
+            <div>
+                <input type="number" value= "{{Humidity_C}}" min="-10" max="50" placeholder="50" onchange="check_placeholder('Humidity')" id='Humidity'>
+            </div>
+            <legend >Temperature控制</legend>
+            <div>
+                <input type="number" value= "{{Temperature_C}}" min="0" max="100" placeholder="100" onchange="check_placeholder('Temperature')" id='Temperature'>
+            </div>
+        {% endblock HT_control %}
+    {% endif %}
+{% endblock body %}

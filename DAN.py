@@ -67,7 +67,7 @@ def detect_local_ec():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((UDP_IP, UDP_PORT))
-    while EASYCONNECT_HOST==None:
+    while EASYCONNECT_HOST == None:
         print ('Searching for the IoTtalk server...')
         data, addr = s.recvfrom(1024)
         if str(data.decode()) == 'easyconnect':
