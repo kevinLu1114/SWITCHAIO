@@ -1,14 +1,20 @@
 {% extends 'base.html' %}
 
 {% block head %}
-    <title>{{profile['d_name']}}</title>
+    {% if not state %} <title> {{profile['d_name']}}</title>
+    {% else %} <title> No_con </title>
+    {% endif %}
     {% block ref %}
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/css/bootstrap4-toggle.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.5.0/js/bootstrap4-toggle.min.js"></script>
+    {% if data['Manual_mode'] == 1 %}
+    <script src="{{ url_for('static', filename='js/mswitch_control.js') }}"></script>
+    {% else %}
     <script src="{{ url_for('static', filename='js/switch_control.js') }}"></script>
+    {% endif %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     {% endblock ref %}
 {% endblock head %}
@@ -17,109 +23,210 @@
 
     {% if state %}
         <h1>請去IOTTalk做連線</h1>
-        <h2>d_name {{profile['d_name']}}</h2>
-        <h2>dm_name {{profile['dm_name']}}</h2>
+        <h2>d_name = {{profile['d_name']}}</h2>
+        <h2>dm_name = {{profile['dm_name']}}</h2>
+        <h2>IOTTALK SERVER = {{IOT_ServerURL}}</h2>
     {% else %}
-        {% block switch %}
-        <form>
-        <fieldset>
-            <legend >SWITCH狀態</legend>
-            <input type="checkbox" checked data-toggle="toggle" data-size="lg" id='switch'>
-        </fieldset>
-        </form>
-        {% endblock switch %}
+        <div class="row">
+        
+            {% block manual %}
+            <div class="col-6">
+                <table class="table table-bordered table-dark" style="width:30%">
+                        <tr><th>手動狀態</th></tr>
+                        {% if data['Manual_mode'] == 1 %}
+                        <tr><th><input class='cb' type="checkbox" id='Manual_mode' checked data-toggle="toggle" data-style="ios"></th></tr>
+                        {% else %}
+                        <tr><th><input class='cb' type="checkbox" id='Manual_mode' data-toggle="toggle" data-style="ios"></th></tr>
+                        {% endif %}     
+                    </table>
+                </div>
+            {% endblock manual %}
+            
+            {% if data['Manual_mode'] == 1 %}
+            {% block switch %}
+                <div class="col-6">
+                    <table class="table table-bordered table-dark" style="width:30%">
+                        <tr><th>SWITCH狀態</th></tr>
+                        {% if data['switch'] == 1 %}
+                            {% if data['Manual_mode'] == 1 %}
+                                <tr><th><input class='cb' type="checkbox" id='switch' checked data-toggle="toggle" data-style="ios"></th></tr>
+                            {% else %}
+                                <tr><th><input class='cb' type="checkbox" id='switch' checked disabled data-toggle="toggle" data-style="ios"></th></tr>
+                            {% endif %}
+                        {% else %}
+                            {% if data['Manual_mode'] == 1 %}
+                                <tr><th><input class='cb' type="checkbox" id='switch' data-toggle="toggle" data-style="ios"></th></tr>
+                            {% else %}
+                                <tr><th><input class='cb' type="checkbox" id='switch' disabled data-toggle="toggle" data-style="ios"></th></tr>
+                            {% endif %}
+                        {% endif %}     
+                    </table>
+                </div>
+            {% endblock switch %}
 
-        {% block HT %}
-            <table class="table table-bordered table-dark" style="width:30%">
-                <thead>
-                  <tr>
-                    <th scope="col" colspan='2'>即時顯示</th>
-                  </tr>
-                  <tr>
-                    <th scope="col">Humidity</th>
-                    <th scope="col">Temperature</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                        <td scope="row-3" id ='Humidity1-O'>None</td>
-                        <td scope="row-3" id ='Temperature1-O'>None</td>
-                  </tr>
-                </tbody>
-              </table>
-            <table class="table table-bordered table-dark" style="width:30%">
-                
-                <tr>
-                    <th scope="col-3">Humidity</th>
-                    <th scope="col-3">Temperature</th>
-                </tr>
-                <tr>
-                    <td scope="row-3" id ='Humidity1-O'>None</td>
-                    <td scope="row-3" id ='Temperature1-O'>None</td>
-                </tr>
-            </table>
-        {% endblock HT %}
+        {% else %}
 
-        {% block Time_control %}
-        <form class="form-inline" action="{{ url_for('') }}" method="POST">
-            <table class="table table-bordered table-dark" style="width:30%">
+            {% block HT %}
+                <div class="col-4">
+                <table class="table table-bordered table-dark">
+                    <thead>
                     <tr>
-                        <th scope="col-3">時間控制</th>
-                        <th scope="col-3">小時</th>
-                        <th scope="col-3">分鐘</th>
+                        <th scope="col" colspan='2'>即時顯示</th>
                     </tr>
                     <tr>
-                        <td>
-                            開始時間
-                        </td>
-                        <td>
-                            <select class="form-control" name='start_hour'>
-                            {% for hour in range(1, 24) %}
-                                <option value={{hour}}>{{hour}}</option>
-                            {% endfor %}
-                        </td>
-                        <td>
-                            <select class="form-control" name='start_min'>
-                            {% for min in range(1, 60) %}
-                                <option value={{min}}>{{min}}</option>
-                            {% endfor %}
-                        </td>
+                        <th scope="col">Humidity</th>
+                        <th scope="col">Temperature</th>
                     </tr>
+                    </thead>
+                    <tbody>
                     <tr>
-                        <td>
-                            結束時間
-                        </td>
-                        <td>
-                            <select class="form-control" name='end_hour'>
-                            {% for hour in range(1, 24) %}
-                                <option value={{hour}}>{{hour}}</option>
-                            {% endfor %}
-                        </td>
-                        <td>
-                            <select class="form-control" name='end_min'>
-                            {% for min in range(1, 60) %}
-                                <option value={{min}}>{{min}}</option>
-                            {% endfor %}
-                        </td>
+                            <td scope="row-3" id ='Humidity1-O'>None</td>
+                            <td scope="row-3" id ='Temperature1-O'>None</td>
                     </tr>
-                    <tr>
-                        <td colspan='3'>
-                            <input type="submit" class="btn btn-primary" value="更改">
-                        </td>
-                    </tr>
-            </table>
-        </form>
-        {% endblock Time_control %}
-
-        {% block HT_control %}
-            <legend >Humidity控制</legend>
-            <div>
-                <input type="number" value= "{{Humidity_C}}" min="-10" max="50" placeholder="50" onchange="check_placeholder('Humidity')" id='Humidity'>
+                    </tbody>
+                </table>
+                </div>
+            {% endblock HT %}
             </div>
-            <legend >Temperature控制</legend>
-            <div>
-                <input type="number" value= "{{Temperature_C}}" min="0" max="100" placeholder="100" onchange="check_placeholder('Temperature')" id='Temperature'>
+            <div class="row">
+            {% block Time_control %}
+            <div class="col-6">
+            <form class="form-inline" action="" method="POST" id='form_Time_control'>
+                <table class="table table-bordered table-dark">
+                        <tr>
+                            <th scope="col-3">時間控制</th>
+                            <th scope="col-3">小時</th>
+                            <th scope="col-3">分鐘</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                開始時間
+                            </td>
+                            <td>
+                                <select class="form-control" name='start_hour'>
+                                {% for hour in range(1, 24) %}
+                                    {% if hour == data['start_hour'] %}
+                                    <option value='{{hour}}' selected>{{hour}}</option>
+                                    {% else %}
+                                    <option value='{{hour}}'>{{hour}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <select class="form-control" name='start_min'>
+                                {% for min in range(1, 60) %}
+                                    {% if min == data['start_min'] %}
+                                    <option value='{{min}}' selected>{{min}}</option>
+                                    {% else %}
+                                    <option value='{{min}}'>{{min}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                結束時間
+                            </td>
+                            <td>
+                                <select class="form-control" name='end_hour'>
+                                {% for hour in range(1, 24) %}
+                                    {% if hour == data['end_hour'] %}
+                                    <option value='{{hour}}' selected>{{hour}}</option>
+                                    {% else %}
+                                    <option vaue='{{hour}}'>{{hour}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <select class="form-control" name='end_min'>
+                                {% for min in range(1, 60) %}
+                                    {% if min == data['end_min'] %}
+                                    <option value='{{min}}' selected>{{min}}</option>
+                                    {% else %}
+                                    <option value='{{min}}'>{{min}}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan='3'>
+                                <input type="button" class="btn btn-primary" value="更改" onclick="update('#form_Time_control')">
+                            </td>
+                        </tr>
+                </table>
+            </form>
             </div>
-        {% endblock HT_control %}
+            {% endblock Time_control %}
+
+            {% block HT_control %}
+            <div class="col-6">
+            <form class="form-inline" action="" method="POST" id='form_HT_control'>
+                    <table class="table table-bordered table-dark">
+                            <tr>
+                                <th scope="col-3">濕溫控制</th>
+                                <th scope="col-3">Humidity</th>
+                                <th scope="col-3">Temperature</th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    低於
+                                </td>
+                                <td>
+                                    <select class="form-control" name='max_Humidity'>
+                                    {% for Humidity in range(-10, 50) %}
+                                        {% if Humidity == data['max_Humidity']  %}
+                                        <option value='{{Humidity}}' selected>{{Humidity}}</option>
+                                        {% else %}
+                                        <option value='{{Humidity}}'>{{Humidity}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <select class="form-control" name='max_Temperature'>
+                                    {% for Temperature in range(0, 100) %}
+                                        {% if Temperature == data['max_Temperature'] %}
+                                        <option value='{{Temperature}}' selected>{{Temperature}}</option>
+                                        {% else %}
+                                        <option value='{{Temperature}}'>{{Temperature}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    高於
+                                </td>
+                                <td>
+                                    <select class="form-control" name='min_Humidity'>
+                                    {% for Humidity in range(-10, 50) %}
+                                        {% if Humidity == data['min_Humidity'] %}
+                                        <option value='{{Humidity}}' selected>{{Humidity}}</option>
+                                        {% else %}
+                                        <option value='{{Humidity}}'>{{Humidity}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <select class="form-control" name='min_Temperature'>
+                                    {% for Temperature in range(0, 100) %}
+                                        {% if Temperature == data['min_Temperature'] %}
+                                        <option value='{{Temperature}}' selected>{{Temperature}}</option>
+                                        {% else %}
+                                        <option value='{{Temperature}}'>{{Temperature}}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan='3'>
+                                    <input type="button" class="btn btn-primary" value="更改" onclick="update('#form_HT_control')">
+                                </td>
+                            </tr>
+                    </table>
+                </form>
+                </div>
+            {% endblock HT_control %}
+            </div>
+        {% endif %}
     {% endif %}
 {% endblock body %}

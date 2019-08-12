@@ -1,0 +1,12 @@
+{
+    "Manual_mode":1,
+    "end_hour":21,
+    "end_min":41,
+    "max_Humidity":8,
+    "max_Temperature":13,
+    "min_Humidity":28,
+    "min_Temperature":50,
+    "start_hour":12,
+    "start_min":13,
+    "switch":1
+}

@@ -21,10 +21,12 @@ def ControlChannel():
     NewSession=requests.Session()
     control_channel_timestamp = None
     while True:
-        time.sleep(2)
+        time.sleep(3)
         try:
             CH = csmapi.pull(MAC,'__Ctl_O__', NewSession)
+            #print(SelectedDF)
             if CH != []:
+                
                 if control_channel_timestamp == CH[0][0]: continue
                 control_channel_timestamp = CH[0][0]
                 cmd = CH[0][1][0]
@@ -44,6 +46,7 @@ def ControlChannel():
                         if STATUS == '1':
                             SelectedDF.append(profile['df_list'][index])
                         index=index+1
+                
         except Exception as e:
             print ('Control error:', e)
             if str(e).find('mac_addr not found:') != -1:
@@ -51,7 +54,8 @@ def ControlChannel():
                 device_registration_with_retry()
             else:
                 print('ControlChannel failed due to unknow reasons.')
-                time.sleep(1)    
+                time.sleep(1)
+        
 
 def get_mac_addr():
     from uuid import getnode
@@ -117,7 +121,7 @@ def pull(FEATURE_NAME):
 
     if state == 'RESUME': data = csmapi.pull(MAC,FEATURE_NAME)
     else: data = []
-        
+    #print(data)
     if data != []:
         if timestamp[FEATURE_NAME] == data[0][0]:
             return None

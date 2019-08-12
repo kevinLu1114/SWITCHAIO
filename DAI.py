@@ -2,104 +2,161 @@ import time, random, requests, threading, json, os
 import DAN
 import atexit
 
+from flask import Flask, render_template, request, jsonify, url_for, redirect
 
-from flask import Flask, render_template, request, jsonify, url_for
+def Auto_pull ():
+    global odf_list, odf_data, data
+    while True:
+        time.sleep(3)
+        if DAN.state == 'RESUME' and data['Manual_mode_mode'] == 0:
+            for odf in odf_list:
+                d = DAN.pull(odf)
+                if d != None:
+                    odf_data[odf] = d[0]
+                else:
+                    odf_data[odf] = 'GG'
+            flag_h = flag_t = False
+            flag_error = True
+            if odf_data['Humidity1-O'] != 'GG':
+                flag_error = False
+                flag_h = data['min_Humidity'] > odf_data['Humidity1-O'] or odf_data['Humidity1-O'] < data['max_Humidity']
+            if odf_data['Temperature1-O'] != 'GG':
+                flag_error = False
+                flag_t = data['min_Temperature'] > odf_data['Temperature1-O'] or odf_data['Temperature1-O'] < data['max_Temperature']
+            if not flag_error:
+                if flag_h or flag_t:
+                    Switch_control(1)
+                else:
+                    Switch_control(0)
 
-'''
-#ServerURL = 'http://IP:9999'      #with non-secure connection
 IOT_ServerURL = 'http://140.113.111.72:9999' #with SSL connection
 Reg_addr = None #if None, Reg_addr = MAC address
-
-DAN.profile['dm_name'] = 'SwitchAIO'
-DAN.profile['df_list'] = ['Switch1', 'Humidity1-O', 'Temperature1-O']
-#DAN.profile['d_name']= 'Assign a Device Name' 
-
-DAN.device_registration_with_retry(IOT_ServerURL, Reg_addr)
-#DAN.deregister()  #if you want to deregister this device, uncomment this line
-#exit()            #if you want to deregister this device, uncomment this line
-'''
-
-'''
-while True:
-    try:
-        IDF_data = random.uniform(1, 10)
-        DAN.push ('Switch1', IDF_data) #Push data to an input device feature "Dummy_Sensor"
-
-        #==================================
-
-        ODF_data = DAN.pull('Humidity1-O')#Pull data from an output device feature "Dummy_Control"
-        if ODF_data != None:
-            print ('Humidity1-O', ODF_data[0])
-
-        #DF_data = DAN.pull('Temperature1_O')#Pull data from an output device feature "Dummy_Control"
-        #if ODF_data != None:
-        #    print ('Temperature1_O', ODF_data[0])
-
-    except Exception as e:
-        print(e)
-        if str(e).find('mac_addr not found:') != -1:
-            print('Reg_addr is not found. Try to re-register...')
-            DAN.device_registration_with_retry(IOT_ServerURL, Reg_addr)
-        else:
-            print('Connection failed due to unknow reasons.')
-            time.sleep(1)    
-
-    time.sleep(0.2)
-'''
-def Auto_pull():
-    pass
-
-def on_exit():
-    DAN.deregister()
-    killport(WEB_PORT)
-
 
 WEB_HOST = '0.0.0.0'
 WEB_PORT = 80
 
-odf_data_queue = {}
+config_name = 'config.json'
+idf_list = ['Switch1']
+odf_list = ['Humidity1-O', 'Temperature1-O']
+odf_data = {}
+
+
+
+data = {
+    'switch':0,
+    'start_hour' : 12,
+    'start_min' : 13,
+    'end_hour' : 21,
+    'end_min' : 41,
+    'min_Temperature':50,
+    'max_Temperature':13,
+    'min_Humidity':28,
+    'max_Humidity':32,
+    'Manual_mode':0
+}
 
 
 app = Flask(__name__)
 
 
-@app.route('/')
-def mail_page():
+@app.route('/', methods=['GET'])
+def index():
+    global data
     return render_template('index.html', profile=DAN.profile
-                                       , state=DAN.state=='SUSPEND')
+                                       , state=DAN.state=='SUSPEND'
+                                       , data=data
+                                       , IOT_ServerURL=IOT_ServerURL)
 
-@app.route('/pull', methods=['POST', 'GET'])
+@app.route('/pull', methods=['GET'])
 def get_pull():
-    ret = {'Humidity1-O': odf_data_queue['Humidity1-O'].pop(), 'Temperature1-O': odf_data_queue['Temperature1-O'].pop()}
-    return json.dumps(ret)
+    global odf_data
+    if DAN.state == 'SUSPEND':
+        return redirect(url_for('index'))
+    return json.dumps(odf_data)
+
+@app.route('/con_check', methods=['GET'])
+def get_con():
+    return json.dumps(DAN.state == 'RESUME')
+
+@app.route('/update', methods=['POST', 'GET'])
+def update():
+    global data
+    if request.method == 'POST':
+        datas = request.form.to_dict()
+        for d in datas:
+            data[d] = int(datas[d])
+        return json.dumps(data)
+        save_config(config_name)
+    else:
+        datas = request.form.to_dict()
+        print(datas)
+        save_config(config_name)
+        
+
 
 def killport(port):
     command=f'lsof -nti:{port} | xargs kill -9'
     os.system(command)
 
-if '__main__' == __name__:
-    global odf_data_queue
-    #killport(WEB_PORT)
-    IOT_ServerURL = 'http://140.113.111.72:9999' #with SSL connection
-    Reg_addr = None #if None, Reg_addr = MAC address
+def on_exit():
+    DAN.deregister()
+    killport(WEB_PORT)
+    save_config(config_name)
+    
 
-    idf_list = ['Switch1']
-    odf_list = ['Humidity1-O', 'Temperature1-O']
-    for odf in odf_list:
-        odf_data_queue[odf] = ['None']
+def open_config(filename):
+    global data
+    if os.path.isfile(filename):
+        with open(filename, 'r') as f:
+            if f != None:
+                data = json.load(f)
+
+def save_config(filename):
+    global data
+    with open(filename, 'w') as f:
+        t = json.dumps(data, sort_keys=True, indent=4, separators=(',', ':'))
+        f.write(t)
+
+def Switch_control(flag):
+    if flag:
+        flag = 1
+    else:
+        flag = 0
+    DAN.push('Switch1', flag)
+
+def time_control():
+    global data
+    while True:
+        if data['Manual_mode'] == 0:
+            now = time.localtime()  # 当前时间的纪元值
+            fmt = "%H %M"
+            now = time.strftime(fmt, now)  # 将纪元值转化为包含时、分的字符串
+            now_hour, now_min = now.split(' ') #以空格切割，将时、分放入名为now的列表中
+            now_hour = int(now_hour)
+            now_min = int(now_min)
+            if now_hour == data['start_hour'] and now_min == data['start_min']:
+                Switch_control(1)
+            elif now_hour == data['end_hour'] and now_min == data['end_min']:
+                Switch_control(0)
+            time.sleep(30)
+
+if '__main__' == __name__:
+    #killport(WEB_PORT)
 
     DAN.profile['dm_name'] = 'SwitchAIO'
     DAN.profile['d_name'] = 'TEST_SwitchAIO'
-    DAN.profile['df_list'] = idf_list.extend(odf_list)
+    DAN.profile['df_list'] = idf_list + odf_list
 
-    #atuo pull odf data
-    auto_pull = threading.Thread(target = auto_pull)
-    auto_pull.start()
-
+    open_config(config_name)
     #DAN.profile['d_name']= 'Assign a Device Name' 
 
     DAN.device_registration_with_retry(IOT_ServerURL, Reg_addr)
 
+    t_auto_pull = threading.Thread(target=Auto_pull)
+    t_auto_pull.start()
+
+    t_time_control = threading.Thread(target=time_control)
+    t_time_control.start()
 
     atexit.register(on_exit)
 
