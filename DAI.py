@@ -1,4 +1,4 @@
-import time, random, requests, threading, json, os
+import time, random, requests, threading, json, os, datetime
 import DAN
 import atexit
 
@@ -8,28 +8,13 @@ def Auto_pull ():
     global odf_list, odf_data, data
     while True:
         time.sleep(3)
-        if DAN.state == 'RESUME' and data['Manual_mode'] == 0:
+        if DAN.state == 'RESUME':
             for odf in odf_list:
                 d = DAN.pull(odf)
                 if d != None:
                     odf_data[odf] = d[0]
                 else:
                     odf_data[odf] = 'GG'
-            flag_h = flag_t = False
-            flag_error = True
-            if odf_data['Humidity1-O'] != 'GG':
-                flag_error = False
-                flag_h = data['min_Humidity'] < odf_data['Humidity1-O'] or odf_data['Humidity1-O'] > data['max_Humidity']
-            if odf_data['Temperature1-O'] != 'GG':
-                flag_error = False
-                flag_t = data['min_Temperature'] < odf_data['Temperature1-O'] or odf_data['Temperature1-O'] > data['max_Temperature']
-            
-            if not flag_error:
-                print(data['Manual_mode'])
-                if flag_h or flag_t:
-                    Switch_control(1, 'control')
-                else:
-                    Switch_control(0, 'control')
 
 IOT_ServerURL = 'http://140.113.111.72:9999' #with SSL connection
 Reg_addr = None #if None, Reg_addr = MAC address
@@ -100,12 +85,12 @@ def update():
                 print(switch)
                 Switch_control(switch, 'not_auto')
                 save_config(config_name)
-                return json.dumps(data)
+            return json.dumps(data)
         else:
             if int(maum) != data['Manual_mode']:
                 data['Manual_mode'] = int(maum)
                 save_config(config_name)
-                return json.dumps(data)
+            return json.dumps(data)
         
         
 def killport(port):
@@ -140,22 +125,45 @@ def Switch_control(flag, con):
         flag = 0
     data['switch'] = flag
 
-def time_control():
+
+def check_time():
+    global data
+    now = datetime.datetime.now()
+    sh = data['start_hour']
+    sm = data['start_min']
+    eh = data['end_hour']
+    em = data['end_min']
+    if datetime.time(sh,sm) <= now.time() <= datetime.time(eh,em):
+        return 1
+    else:
+        return 0
+
+
+def check_control():
+    global data, odf_data
+    flag_h = flag_t = False
+    flag_error = True
+    if odf_data['Humidity1-O'] != 'GG':
+        flag_error = False
+        flag_h = data['min_Humidity'] < odf_data['Humidity1-O'] or odf_data['Humidity1-O'] > data['max_Humidity']
+    if odf_data['Temperature1-O'] != 'GG':
+        flag_error = False
+        flag_t = data['min_Temperature'] < odf_data['Temperature1-O'] or odf_data['Temperature1-O'] > data['max_Temperature']
+    
+    if not flag_error:
+        print(data['Manual_mode'])
+        if flag_h or flag_t:
+            return 1
+        else:
+            return 0
+
+
+
+def auto_push_switch():
     global data
     while True:
         if data['Manual_mode'] == 0:
-            now = time.localtime()  # 当前时间的纪元值
-            fmt = "%H %M"
-            now = time.strftime(fmt, now)  # 将纪元值转化为包含时、分的字符串
-            now_hour, now_min = now.split(' ') #以空格切割，将时、分放入名为now的列表中
-            now_hour = int(now_hour)
-            now_min = int(now_min)
-            if now_hour == data['start_hour'] and now_min == data['start_min']:
-                Switch_control(1, 'timer')
-            elif now_hour == data['end_hour'] and now_min == data['end_min']:
-                Switch_control(0, 'timer')
-            print(now_hour, now_min)
-        print(data['switch'])
+            pass
         DAN.push('Switch1', data['switch'])
         time.sleep(5)
         
@@ -175,7 +183,7 @@ if '__main__' == __name__:
     t_auto_pull = threading.Thread(target=Auto_pull)
     t_auto_pull.start()
 
-    t_time_control = threading.Thread(target=time_control)
+    t_time_control = threading.Thread(target=auto_push_switch)
     t_time_control.start()
 
     atexit.register(on_exit)
@@ -184,5 +192,5 @@ if '__main__' == __name__:
         host=WEB_HOST,
         port=WEB_PORT,
         threaded = True,
-        debug=True
+        debug=False
     )

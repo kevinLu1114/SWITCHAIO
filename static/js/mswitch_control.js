@@ -20,7 +20,7 @@ $(function(){
             if(!is_con && !is_pull)
             {
                 is_pull = true;
-                //setInterval(update, 3000, '');
+                setInterval(update, 3000, '');
             }
         }).fail(function (data) {
 
