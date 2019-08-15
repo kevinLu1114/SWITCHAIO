@@ -2,9 +2,9 @@ import time, random, requests, threading, json, os, datetime
 import DAN
 import atexit
 
-from flask import Flask, render_template, request, jsonify, url_for, redirect
+from flask import Flask, render_template, request, jsonify, url_for, redirect, abort
 
-def Auto_pull ():
+def Auto_pull():
     global odf_list, odf_data, data
     while True:
         time.sleep(3)
@@ -19,7 +19,7 @@ def Auto_pull ():
 IOT_ServerURL = 'http://140.113.111.72:9999' #with SSL connection
 Reg_addr = None #if None, Reg_addr = MAC address
 
-WEB_HOST = '0.0.0.0'
+WEB_HOST = '127.0.0.1'
 WEB_PORT = 80
 
 config_name = 'config.json'
@@ -30,15 +30,13 @@ odf_data = {}
 
 
 data = {
-    'switch':0,
+    'switch': 0,
     'start_hour' : 12,
     'start_min' : 13,
     'end_hour' : 21,
     'end_min' : 41,
-    'min_Temperature':50,
-    'max_Temperature':13,
-    'min_Humidity':28,
-    'max_Humidity':32,
+    'Temperature':13,
+    'Humidity':32,
     'Manual_mode':0
 }
 
@@ -56,42 +54,24 @@ def index():
 
 @app.route('/pull', methods=['GET'])
 def get_pull():
-    global odf_data
+    global odf_data, data
     if DAN.state == 'SUSPEND':
-        return redirect(url_for('index'))
-    return json.dumps(odf_data)
+        abort(404)
+    return json.dumps(dict( **odf_data, **data))
 
 @app.route('/con_check', methods=['GET'])
 def get_con():
     return json.dumps(DAN.state == 'RESUME')
 
-@app.route('/update', methods=['POST', 'GET'])
+@app.route('/update', methods=['POST'])
 def update():
     global data
-    if request.method == 'POST':
-        datas = request.form.to_dict()
-        for d in datas:
-            data[d] = int(datas[d])
-        save_config(config_name)
-        return json.dumps(data)
-    else:
-        datas = request.args.to_dict()
-        print(datas)
-        switch = datas.get('switch', 'None')
-        maum = datas.get('Manual_mode', 'None')
-        if switch != 'None':
-            if int(switch) != data['switch']:
-                data['switch'] = int(switch)
-                print(switch)
-                Switch_control(switch, 'not_auto')
-                save_config(config_name)
-            return json.dumps(data)
-        else:
-            if int(maum) != data['Manual_mode']:
-                data['Manual_mode'] = int(maum)
-                save_config(config_name)
-            return json.dumps(data)
-        
+    datas = request.form.to_dict()
+    print(datas)
+    for d in datas:
+        data[d] = int(datas[d])
+    save_config(config_name)
+    return json.dumps(data)
         
 def killport(port):
     command=f'lsof -nti:{port} | xargs kill -9'
@@ -134,28 +114,16 @@ def check_time():
     eh = data['end_hour']
     em = data['end_min']
     if datetime.time(sh,sm) <= now.time() <= datetime.time(eh,em):
-        return 1
+        return True
     else:
-        return 0
-
-
+        return False
+        
 def check_control():
     global data, odf_data
-    flag_h = flag_t = False
-    flag_error = True
     if odf_data['Humidity1-O'] != 'GG':
-        flag_error = False
-        flag_h = data['min_Humidity'] < odf_data['Humidity1-O'] or odf_data['Humidity1-O'] > data['max_Humidity']
-    if odf_data['Temperature1-O'] != 'GG':
-        flag_error = False
-        flag_t = data['min_Temperature'] < odf_data['Temperature1-O'] or odf_data['Temperature1-O'] > data['max_Temperature']
-    
-    if not flag_error:
-        print(data['Manual_mode'])
-        if flag_h or flag_t:
-            return 1
-        else:
-            return 0
+        return data['Humidity'] > odf_data['Humidity1-O']
+    else:
+        return True
 
 
 
@@ -163,7 +131,8 @@ def auto_push_switch():
     global data
     while True:
         if data['Manual_mode'] == 0:
-            pass
+            if check_time() and check_control():
+                pass
         DAN.push('Switch1', data['switch'])
         time.sleep(5)
         

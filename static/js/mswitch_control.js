@@ -1,7 +1,11 @@
 is_pull = false;
+var Manual_mode;
 
 $(function(){
     setInterval(con_check, 4000, '');
+
+    Manual_mode =  $('#Manual_mode').prop('checked')?1:0;
+    console.log(Manual_mode);
 
     function con_check (callback) {
         console.log("con_check");
@@ -30,6 +34,7 @@ $(function(){
         });
     }
 
+    /*
     $('.cb').change(function() {
         console.log('????');
         var id = $(this).attr('id');
@@ -46,44 +51,67 @@ $(function(){
             'data': str
         }).done(function (data) {
             console.log(id);
-            window.location.reload('/');
+            //window.location.reload('/');
         }).fail(function (data) {
             
         }).always(function() {
         
         });
     });
+    */
 })
 
 function update (form) {
     //console.log($(form).serialize());
-    var data = new FormData($(form)[0]);
-    //console.log(data);
+    var formdata;
+    if(form == '')
+    {
+        formdata = new FormData();
+        formdata.append('switch', $('#switch').prop('checked')?'1':'0');
+        formdata.append('Manual_mode', $('#Manual_mode').prop('checked')?'1':'0');
+        for (var key of formdata.entries()) {
+            console.log(key[0] + ', ' + key[1]);
+        }
+    
+    }
+    else
+    {
+        formdata = new FormData($(form)[0]);
+    }
+    
     $.ajax({
         'url': '/update',
         'method': 'POST',
         'contentType': 'text/html',
-        'data' : data,
+        'data' : formdata,
         'processData': false,
         'contentType': false
-    }).done(function (datas) {
-        console.log(datas);
-        datas = JSON.parse(datas);
-        if(datas['switch'] != '')
-            $('#switch').bootstrapToggle(datas['switch']==1?'on':'off');
+    }).done(function (data) {
+
+        /*
+        //console.log(datas);
+        data = JSON.parse(data);
+        if(data['switch'] != '')
+            $('#switch').bootstrapToggle(data['switch']==1?'on':'off');
             //$('#switch').prop('checked',).change();
-        if(datas['Manual_mode'] != '')
-            $('#Manual_mode').bootstrapToggle(datas['Manual_mode']==1?'on':'off');
-            //$('#Manual_mode').prop('checked',datas['Manual_mode']==1?true:false).change(true);
+        if(Manual_mode != data['Manual_mode'] || data['Manual_mode'] != $('#Manual_mode').prop('checked')?1:0)
+            //console.log($('#Manual_mode').prop('checked')?'1':'0');
+            window.location.reload('/');
+        */
         
-    }).fail(function (datas) {
+    }).fail(function (data) {
         
     }).always(function() {
         if(typeof callback === 'function')
             callback();
     });
+
+
 }
 
+function abc() {
+    console.log(123);
+}
 
 
 
