@@ -108,8 +108,6 @@ def update():
                 return json.dumps(data)
         
         
-
-
 def killport(port):
     command=f'lsof -nti:{port} | xargs kill -9'
     os.system(command)
@@ -140,7 +138,7 @@ def Switch_control(flag, con):
         flag = 1
     else:
         flag = 0
-    DAN.push('Switch1', flag)
+    data['switch'] = flag
 
 def time_control():
     global data
@@ -156,8 +154,11 @@ def time_control():
                 Switch_control(1, 'timer')
             elif now_hour == data['end_hour'] and now_min == data['end_min']:
                 Switch_control(0, 'timer')
+            print(now_hour, now_min)
+        print(data['switch'])
+        DAN.push('Switch1', data['switch'])
         time.sleep(5)
-        print(now_hour, now_min)
+        
 
 if '__main__' == __name__:
     #killport(WEB_PORT)

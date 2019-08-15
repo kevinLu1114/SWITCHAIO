@@ -21,7 +21,7 @@ $(function(){
             {
                 is_pull = true;
                 console.log(is_pull);
-                //setInterval(pull, 3000, '');
+                setInterval(pull, 3000, '');
                 //setInterval(update, 5000, '');
             }
         }).fail(function (data) {
