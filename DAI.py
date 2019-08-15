@@ -8,7 +8,7 @@ def Auto_pull ():
     global odf_list, odf_data, data
     while True:
         time.sleep(3)
-        if DAN.state == 'RESUME' and data['Manual_mode_mode'] == 0:
+        if DAN.state == 'RESUME' and data['Manual_mode'] == 0:
             for odf in odf_list:
                 d = DAN.pull(odf)
                 if d != None:
@@ -19,15 +19,17 @@ def Auto_pull ():
             flag_error = True
             if odf_data['Humidity1-O'] != 'GG':
                 flag_error = False
-                flag_h = data['min_Humidity'] > odf_data['Humidity1-O'] or odf_data['Humidity1-O'] < data['max_Humidity']
+                flag_h = data['min_Humidity'] < odf_data['Humidity1-O'] or odf_data['Humidity1-O'] > data['max_Humidity']
             if odf_data['Temperature1-O'] != 'GG':
                 flag_error = False
-                flag_t = data['min_Temperature'] > odf_data['Temperature1-O'] or odf_data['Temperature1-O'] < data['max_Temperature']
+                flag_t = data['min_Temperature'] < odf_data['Temperature1-O'] or odf_data['Temperature1-O'] > data['max_Temperature']
+            
             if not flag_error:
+                print(data['Manual_mode'])
                 if flag_h or flag_t:
-                    Switch_control(1)
+                    Switch_control(1, 'control')
                 else:
-                    Switch_control(0)
+                    Switch_control(0, 'control')
 
 IOT_ServerURL = 'http://140.113.111.72:9999' #with SSL connection
 Reg_addr = None #if None, Reg_addr = MAC address
@@ -85,12 +87,26 @@ def update():
         datas = request.form.to_dict()
         for d in datas:
             data[d] = int(datas[d])
+        save_config(config_name)
         return json.dumps(data)
-        save_config(config_name)
     else:
-        datas = request.form.to_dict()
+        datas = request.args.to_dict()
         print(datas)
-        save_config(config_name)
+        switch = datas.get('switch', 'None')
+        maum = datas.get('Manual_mode', 'None')
+        if switch != 'None':
+            if int(switch) != data['switch']:
+                data['switch'] = int(switch)
+                print(switch)
+                Switch_control(switch, 'not_auto')
+                save_config(config_name)
+                return json.dumps(data)
+        else:
+            if int(maum) != data['Manual_mode']:
+                data['Manual_mode'] = int(maum)
+                save_config(config_name)
+                return json.dumps(data)
+        
         
 
 
@@ -117,8 +133,10 @@ def save_config(filename):
         t = json.dumps(data, sort_keys=True, indent=4, separators=(',', ':'))
         f.write(t)
 
-def Switch_control(flag):
-    if flag:
+def Switch_control(flag, con):
+    global data
+    print(con)
+    if flag == '1' or flag == True or flag == 'true':
         flag = 1
     else:
         flag = 0
@@ -135,10 +153,11 @@ def time_control():
             now_hour = int(now_hour)
             now_min = int(now_min)
             if now_hour == data['start_hour'] and now_min == data['start_min']:
-                Switch_control(1)
+                Switch_control(1, 'timer')
             elif now_hour == data['end_hour'] and now_min == data['end_min']:
-                Switch_control(0)
-            time.sleep(30)
+                Switch_control(0, 'timer')
+        time.sleep(5)
+        print(now_hour, now_min)
 
 if '__main__' == __name__:
     #killport(WEB_PORT)

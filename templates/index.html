@@ -32,7 +32,7 @@
             {% block manual %}
             <div class="col-6">
                 <table class="table table-bordered table-dark" style="width:30%">
-                        <tr><th>手動狀態</th></tr>
+                        <tr><th>手動模式</th></tr>
                         {% if data['Manual_mode'] == 1 %}
                         <tr><th><input class='cb' type="checkbox" id='Manual_mode' checked data-toggle="toggle" data-style="ios"></th></tr>
                         {% else %}
@@ -41,7 +41,7 @@
                     </table>
                 </div>
             {% endblock manual %}
-            
+
             {% if data['Manual_mode'] == 1 %}
             {% block switch %}
                 <div class="col-6">
@@ -104,7 +104,7 @@
                             </td>
                             <td>
                                 <select class="form-control" name='start_hour'>
-                                {% for hour in range(1, 24) %}
+                                {% for hour in range(24) %}
                                     {% if hour == data['start_hour'] %}
                                     <option value='{{hour}}' selected>{{hour}}</option>
                                     {% else %}
@@ -114,7 +114,7 @@
                             </td>
                             <td>
                                 <select class="form-control" name='start_min'>
-                                {% for min in range(1, 60) %}
+                                {% for min in range(60) %}
                                     {% if min == data['start_min'] %}
                                     <option value='{{min}}' selected>{{min}}</option>
                                     {% else %}
@@ -129,7 +129,7 @@
                             </td>
                             <td>
                                 <select class="form-control" name='end_hour'>
-                                {% for hour in range(1, 24) %}
+                                {% for hour in range(24) %}
                                     {% if hour == data['end_hour'] %}
                                     <option value='{{hour}}' selected>{{hour}}</option>
                                     {% else %}
@@ -139,7 +139,7 @@
                             </td>
                             <td>
                                 <select class="form-control" name='end_min'>
-                                {% for min in range(1, 60) %}
+                                {% for min in range(60) %}
                                     {% if min == data['end_min'] %}
                                     <option value='{{min}}' selected>{{min}}</option>
                                     {% else %}

@@ -21,8 +21,8 @@ $(function(){
             {
                 is_pull = true;
                 console.log(is_pull);
-                setInterval(pull, 3000, '');
-                setInterval(update, 5000, '');
+                //setInterval(pull, 3000, '');
+                //setInterval(update, 5000, '');
             }
         }).fail(function (data) {
 
@@ -54,23 +54,28 @@ $(function(){
     }
 
     $('.cb').change(function() {
-        var fd = new FormData();
-        fd.append($(this).attr('id'), $(this).prop('checked') ? 1 : 0);
+        console.log('????');
+        var id = $(this).attr('id');
+        var k = $(this).prop('checked')?1:0;
+        if(id == 'switch')
+            var str = {'switch' : k};
+        else
+            var str = {'Manual_mode': k}
+        console.log(str[id]);
         $.ajax({
             'url': '/update',
-            'method': 'POST',
+            'method': 'GET',
             'contentType': 'text/html',
-            'data': fd,
-            'processData': false,
-            'contentType': false
+            'data': str
         }).done(function (data) {
-            
+            console.log(id);
+            window.location.reload('/');
         }).fail(function (data) {
             
         }).always(function() {
-          
+        
         });
-    })
+    });
 })
 
 function update (form) {
@@ -91,6 +96,13 @@ function update (form) {
             $(`select[name=${k}]`).val(datas[k]);
             console.log(k,  $(`select[name=${k}]`).val());
         }
+        if(datas['switch'] != '')
+             $('#switch').bootstrapToggle(datas['switch']==1?'on':'off');
+        //$('#switch').prop('checked',).change();
+        if(datas['Manual_mode'] != '')
+            $('#Manual_mode').bootstrapToggle(datas['Manual_mode']==1?'on':'off');
+            //$('#Manual_mode').prop('checked',datas['Manual_mode']==1?true:false).change(true);
+    
     }).fail(function (datas) {
         
     }).always(function() {

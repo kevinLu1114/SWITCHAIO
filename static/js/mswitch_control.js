@@ -20,7 +20,7 @@ $(function(){
             if(!is_con && !is_pull)
             {
                 is_pull = true;
-                setInterval(update, 3000, '');
+                //setInterval(update, 3000, '');
             }
         }).fail(function (data) {
 
@@ -32,13 +32,21 @@ $(function(){
 
     $('.cb').change(function() {
         console.log('????');
+        var id = $(this).attr('id');
+        var k = $(this).prop('checked')?1:0;
+        if(id == 'switch')
+            var str = {'switch' : k};
+        else
+            var str = {'Manual_mode': k}
+        console.log(str[id]);
         $.ajax({
             'url': '/update',
             'method': 'GET',
             'contentType': 'text/html',
-            'data': `{${$(this).attr('id')}:${$(this).prop('checked')?1:0}}`
+            'data': str
         }).done(function (data) {
-            
+            console.log(id);
+            window.location.reload('/');
         }).fail(function (data) {
             
         }).always(function() {
