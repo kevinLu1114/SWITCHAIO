@@ -57,6 +57,8 @@ $(function(){
             for(var k in data) {
                 $(`select[name=${k}]`).val(data[k]);
             }
+            $('#Temperature1-O').text(data['Temperature1-O']);
+            $('#Humidity1-O').text(data['Humidity1-O']);
 
         }).fail(function (data) {
             $('#Temperature1-O').text('None');

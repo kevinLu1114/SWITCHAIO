@@ -1,3 +1,10 @@
+#todo 
+#溫溼度 濕度只要低於多少啟動 溫度是高於多少啟動
+#時間到了 判斷濕度有沒有低於控制值
+#todo 
+#溫溼度 濕度只要低於多少啟動 溫度是高於多少啟動
+#時間到了 判斷濕度有沒有低於控制值
+
 import time, random, requests, threading, json, os, datetime
 import DAN
 import atexit
@@ -26,6 +33,7 @@ config_name = 'config.json'
 idf_list = ['Switch1']
 odf_list = ['Humidity1-O', 'Temperature1-O']
 odf_data = {}
+
 
 
 
