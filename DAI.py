@@ -168,7 +168,6 @@ if '__main__' == __name__:
     atexit.register(on_exit)
 
     app.run(
-        host=WEB_HOST,
         port=WEB_PORT,
         threaded = True,
         debug=False
