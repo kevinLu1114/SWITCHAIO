@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "switchaio\\Scripts\\python.exe",
+    "python.pythonPath": "C:\\Users\\Frank-NB\\Anaconda3\\envs\\py36\\python.exe",
     "python.linting.pylintEnabled": false,
     "python.linting.pep8Enabled": false,
     "python.linting.enabled": true

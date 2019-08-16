@@ -79,7 +79,7 @@
 <div id='auto_block' style="display: none">
     <div class="row">
         {% block HT %}
-        <div class="col-4">
+        <div class="col-4 offset-2"" >
             <table class="table table-bordered table-dark">
                 <thead>
                     <tr>
@@ -100,144 +100,165 @@
         </div>
         {% endblock HT %}
     </div>
-
-    {% block Time_control %}
-    <div class="col-6">
-        <form class="form-inline" action="" method="POST" id='form_Time_control'>
-            <table class="table table-bordered table-dark">
-                <tr>
-                    <th scope="col-3">時間控制</th>
-                    <th scope="col-3">小時</th>
-                    <th scope="col-3">分鐘</th>
-                </tr>
-                <tr>
-                    <td>
-                        開始時間
-                    </td>
-                    <td>
-                        <select class="form-control" name='start_hour'>
-                            {% for hour in range(24) %}
-                            {% if hour == data['start_hour'] %}
-                            <option value='{{hour}}' selected>{{hour}}</option>
-                            {% else %}
-                            <option value='{{hour}}'>{{hour}}</option>
-                            {% endif %}
-                            {% endfor %}
-                    </td>
-                    <td>
-                        <select class="form-control" name='start_min'>
-                            {% for min in range(60) %}
-                            {% if min == data['start_min'] %}
-                            <option value='{{min}}' selected>{{min}}</option>
-                            {% else %}
-                            <option value='{{min}}'>{{min}}</option>
-                            {% endif %}
-                            {% endfor %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        結束時間
-                    </td>
-                    <td>
-                        <select class="form-control" name='end_hour'>
-                            {% for hour in range(24) %}
-                            {% if hour == data['end_hour'] %}
-                            <option value='{{hour}}' selected>{{hour}}</option>
-                            {% else %}
-                            <option vaue='{{hour}}'>{{hour}}</option>
-                            {% endif %}
-                            {% endfor %}
-                    </td>
-                    <td>
-                        <select class="form-control" name='end_min'>
-                            {% for min in range(60) %}
-                            {% if min == data['end_min'] %}
-                            <option value='{{min}}' selected>{{min}}</option>
-                            {% else %}
-                            <option value='{{min}}'>{{min}}</option>
-                            {% endif %}
-                            {% endfor %}
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan='3'>
-                        <input type="button" class="btn btn-primary" value="更改" onclick="push('#form_Time_control')">
-                    </td>
-                </tr>
-            </table>
-        </form>
+    <div class="row">
+        {% block Time_control %}
+        <div class="col-4">
+            <form class="form-inline" action="" method="POST" id='form_Time_control'>
+                <table class="table table-bordered table-dark">
+                    <tr>
+                        <th scope="col-3">時間控制</th>
+                        <th scope="col-3">設定</th>
+                        <th scope="col-3">目前設定值</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            開始時間
+                        </td>
+                        <td>
+                            <select class="form-control" name='start_hour'>
+                                {% for hour in range(24) %}
+                                {% if hour == data['start_hour'] %}
+                                <option value='{{hour}}' selected>{{hour}}</option>
+                                {% else %}
+                                <option value='{{hour}}'>{{hour}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            :
+                            <select class="form-control" name='start_min'>
+                                {% for min in range(60) %}
+                                {% if min == data['start_min'] %}
+                                <option value='{{min}}' selected>{{min}}</option>
+                                {% else %}
+                                <option value='{{min}}'>{{min}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <label >00:00</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            結束時間
+                        </td>
+                        <td>
+                            <select class="form-control" name='end_hour'>
+                                {% for hour in range(24) %}
+                                {% if hour == data['end_hour'] %}
+                                <option value='{{hour}}' selected>{{hour}}</option>
+                                {% else %}
+                                <option vaue='{{hour}}'>{{hour}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            :
+                            <select class="form-control" name='end_min'>
+                                {% for min in range(60) %}
+                                {% if min == data['end_min'] %}
+                                <option value='{{min}}' selected>{{min}}</option>
+                                {% else %}
+                                <option value='{{min}}'>{{min}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </td>
+                        <td>
+                            <label>23:00</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan='3'>
+                            <input type="button" class="btn btn-primary" value="更改" onclick="push('#form_Time_control')">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        {% endblock Time_control %}
+        {% block HT_control %}
+        <div class="col-4">
+            <form class="form-inline" action="" method="POST" id='form_HT_control'>
+                <table class="table table-bordered table-dark">
+                    <tr>
+                        <th scope="col-3">濕溫控制</th>
+                        <th scope="col-3">設定</th>
+                        <th scope="col-3">目前設定值</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            濕度
+                        </td>
+                        <td>
+                            最低: 
+                            <select class="form-control" name='min_Humidity'>
+                                {% for Humidity in range(-10, 50) %}
+                                {% if Humidity == data['max_Humidity']  %}
+                                <option value='{{Humidity}}' selected>{{Humidity}}</option>
+                                {% else %}
+                                <option value='{{Humidity}}'>{{Humidity}}</option>
+                                {% endif %}
+                                {% endfor %}
+                        </td>
+                        <td>
+                            <label>999</label>
+                        </td>
+                        <!--
+                        <td>
+                            <select class="form-control" name='min_Temperature'>
+                                {% for Temperature in range(0, 100) %}
+                                {% if Temperature == data['max_Temperature'] %}
+                                <option value='{{Temperature}}' selected>{{Temperature}}</option>
+                                {% else %}
+                                <option value='{{Temperature}}'>{{Temperature}}</option>
+                                {% endif %}
+                                {% endfor %}
+                        </td>
+                        -->
+                    </tr>
+                    <tr>
+                        <td>
+                            溫度
+                        </td>
+                        <!--
+                        <td>
+                            <select class="form-control" name='max_Humidity'>
+                                {% for Humidity in range(-10, 50) %}
+                                {% if Humidity == data['min_Humidity'] %}
+                                <option value='{{Humidity}}' selected>{{Humidity}}</option>
+                                {% else %}
+                                <option value='{{Humidity}}'>{{Humidity}}</option>
+                                {% endif %}
+                                {% endfor %}
+                        </td>
+                        -->
+                        <td>
+                            最高: 
+                            <select class="form-control" name='max_Temperature'>
+                                {% for Temperature in range(0, 100) %}
+                                {% if Temperature == data['min_Temperature'] %}
+                                <option value='{{Temperature}}' selected>{{Temperature}}</option>
+                                {% else %}
+                                <option value='{{Temperature}}'>{{Temperature}}</option>
+                                {% endif %}
+                                {% endfor %}
+                        </td>
+                        <td>
+                            
+                            <label>999</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan='3'>
+                            <input type="button" class="btn btn-primary" value="更改" onclick="push('#form_HT_control')">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        {% endblock HT_control %}
     </div>
-    {% endblock Time_control %}
-
-    {% block HT_control %}
-    <div class="col-6">
-        <form class="form-inline" action="" method="POST" id='form_HT_control'>
-            <table class="table table-bordered table-dark">
-                <tr>
-                    <th scope="col-3">濕溫控制</th>
-                    <th scope="col-3">濕度</th>
-                    <th scope="col-3">溫度</th>
-                </tr>
-                <tr>
-                    <td>
-                        最低
-                    </td>
-                    <td>
-                        <select class="form-control" name='max_Humidity'>
-                            {% for Humidity in range(-10, 50) %}
-                            {% if Humidity == data['max_Humidity']  %}
-                            <option value='{{Humidity}}' selected>{{Humidity}}</option>
-                            {% else %}
-                            <option value='{{Humidity}}'>{{Humidity}}</option>
-                            {% endif %}
-                            {% endfor %}
-                    </td>
-                    <td>
-                        <select class="form-control" name='max_Temperature'>
-                            {% for Temperature in range(0, 100) %}
-                            {% if Temperature == data['max_Temperature'] %}
-                            <option value='{{Temperature}}' selected>{{Temperature}}</option>
-                            {% else %}
-                            <option value='{{Temperature}}'>{{Temperature}}</option>
-                            {% endif %}
-                            {% endfor %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        最高
-                    </td>
-                    <td>
-                        <select class="form-control" name='min_Humidity'>
-                            {% for Humidity in range(-10, 50) %}
-                            {% if Humidity == data['min_Humidity'] %}
-                            <option value='{{Humidity}}' selected>{{Humidity}}</option>
-                            {% else %}
-                            <option value='{{Humidity}}'>{{Humidity}}</option>
-                            {% endif %}
-                            {% endfor %}
-                    </td>
-                    <td>
-                        <select class="form-control" name='min_Temperature'>
-                            {% for Temperature in range(0, 100) %}
-                            {% if Temperature == data['min_Temperature'] %}
-                            <option value='{{Temperature}}' selected>{{Temperature}}</option>
-                            {% else %}
-                            <option value='{{Temperature}}'>{{Temperature}}</option>
-                            {% endif %}
-                            {% endfor %}
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan='3'>
-                        <input type="button" class="btn btn-primary" value="更改" onclick="push('#form_HT_control')">
-                    </td>
-                </tr>
-            </table>
-        </form>
-    </div>
-    {% endblock HT_control %}
 </div>
 {% endif %}
 {% endblock body %}

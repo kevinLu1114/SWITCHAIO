@@ -28,6 +28,7 @@ $(function(){
             if((data == 'false' && !is_con) || (data == 'true' && is_con))
             {
                 window.location.reload('/');
+                console.log("reload now!!!!");
             }
             if(!is_con && !is_pull)
             {
