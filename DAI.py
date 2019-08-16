@@ -26,7 +26,7 @@ def Auto_pull():
 IOT_ServerURL = 'http://140.113.111.72:9999' #with SSL connection
 Reg_addr = None #if None, Reg_addr = MAC address
 
-WEB_HOST = '127.0.0.1'
+WEB_HOST = '0.0.0.0'
 WEB_PORT = 80
 
 config_name = 'config.json'
@@ -168,6 +168,7 @@ if '__main__' == __name__:
     atexit.register(on_exit)
 
     app.run(
+        host=WEB_HOST,
         port=WEB_PORT,
         threaded = True,
         debug=False
