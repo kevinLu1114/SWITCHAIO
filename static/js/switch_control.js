@@ -52,9 +52,11 @@ $(function(){
             'contentType': 'text/html'
         }).done(function (data) {
             data = JSON.parse(data);
-            //console.log(data);
-            $('#Manual_mode').bootstrapToggle(data['Manual_mode']?'on':'off');
-            $('#switch').bootstrapToggle(data['switch']?'on':'off');
+            console.log('switch', data['switch']);
+            $('#Manual_mode').prop('checked', data['Manual_mode']).change();
+            $('#switch').prop('checked', data['switch']).change();
+            //$('#Manual_mode').bootstrapToggle(?'on':'off');
+            //$('#switch').bootstrapToggle(?'on':'off');
             /*
             for(var k in data) {
                 $(`select[name=${k}]`).val(data[k]);
@@ -62,6 +64,8 @@ $(function(){
             */
             $('#current_start_timeSet').text(data['start_hour'] + ' : ' + data['start_min']);
             $('#current_end_timeSet').text(data['end_hour'] + ' : ' + data['end_min']);
+            $('#current_HumiditySet').text(data['min_Humidity']);
+            $('#current_TemperatureSet').text(data['max_Temperature']);
             //console.log(data['switch']);
 
             $('#Temperature1-O').text(data['Temperature1-O']);

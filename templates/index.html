@@ -136,7 +136,7 @@
                             </select>
                         </td>
                         <td>
-                            <label id='current_start_timeSet'>00:00</label>
+                            <label id='current_start_timeSet'>{{data['start_hour']}}:{{data['start_min']}}</label>
                         </td>
                     </tr>
                     <tr>
@@ -165,7 +165,7 @@
                             </select>
                         </td>
                         <td>
-                            <label id='current_end_timeSet'>23:00</label>
+                            <label id='current_end_timeSet'>{{data['end_hour']}}:{{data['end_min']}}</label>
                         </td>
                     </tr>
                     <tr>
@@ -194,7 +194,7 @@
                             最低: 
                             <select class="form-control" name='min_Humidity'>
                                 {% for Humidity in range(-10, 50) %}
-                                {% if Humidity == data['max_Humidity']  %}
+                                {% if Humidity == data['min_Humidity']  %}
                                 <option value='{{Humidity}}' selected>{{Humidity}}</option>
                                 {% else %}
                                 <option value='{{Humidity}}'>{{Humidity}}</option>
@@ -202,7 +202,7 @@
                                 {% endfor %}
                         </td>
                         <td>
-                            <label id='current_HumiditySet'>999</label>
+                            <label id='current_HumiditySet'>{{data['min_Humidity']}}</label>
                         </td>
                         <!--
                         <td>
@@ -237,7 +237,7 @@
                             最高: 
                             <select class="form-control" name='max_Temperature'>
                                 {% for Temperature in range(0, 100) %}
-                                {% if Temperature == data['min_Temperature'] %}
+                                {% if Temperature == data['max_Temperature'] %}
                                 <option value='{{Temperature}}' selected>{{Temperature}}</option>
                                 {% else %}
                                 <option value='{{Temperature}}'>{{Temperature}}</option>
@@ -246,7 +246,7 @@
                         </td>
                         <td>
                             
-                            <label id='current_TemperatureSet'>999</label>
+                            <label id='current_TemperatureSet'>{{data['max_Temperature']}}</label>
                         </td>
                     </tr>
                     <tr>

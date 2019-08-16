@@ -14,7 +14,7 @@ from flask import Flask, render_template, request, jsonify, url_for, redirect, a
 def Auto_pull():
     global odf_list, odf_data, data
     while True:
-        time.sleep(3)
+        time.sleep(5)
         if DAN.state == 'RESUME':
             for odf in odf_list:
                 d = DAN.pull(odf)
@@ -32,20 +32,20 @@ WEB_PORT = 80
 config_name = 'config.json'
 idf_list = ['Switch1']
 odf_list = ['Humidity1-O', 'Temperature1-O']
-odf_data = {}
+odf_data = {'Humidity1-O':'GG', 'Temperature1-O':'GG'}
 
 
 
 
 data = {
-    'switch': 0,
-    'start_hour' : 12,
-    'start_min' : 13,
-    'end_hour' : 21,
-    'end_min' : 41,
-    'Temperature':13,
-    'Humidity':32,
-    'Manual_mode':0
+    "Manual_mode":0,
+    "end_hour":15,
+    "end_min":32,
+    "max_Temperature":9,
+    "min_Humidity":23,
+    "start_hour":16,
+    "start_min":27,
+    "switch":0
 }
 
 
@@ -82,7 +82,7 @@ def update():
     return json.dumps(data)
         
 def killport(port):
-    command=f'lsof -nti:{port} | xargs kill -9'
+    command= f'lsof -nti:{port} | xargs kill -9'
     os.system(command)
 
 def on_exit():
@@ -129,7 +129,7 @@ def check_time():
 def check_control():
     global data, odf_data
     if odf_data['Humidity1-O'] != 'GG':
-        return data['Humidity'] > odf_data['Humidity1-O']
+        return data['min_Humidity'] > odf_data['Humidity1-O']
     else:
         return True
 
@@ -140,7 +140,9 @@ def auto_push_switch():
     while True:
         if data['Manual_mode'] == 0:
             if check_time() and check_control():
-                pass
+                Switch_control(1, 'control')
+            else:
+                Switch_control(0, 'control')
         DAN.push('Switch1', data['switch'])
         time.sleep(5)
         
