@@ -26,7 +26,7 @@ def Auto_pull():
 IOT_ServerURL = 'http://140.113.111.72:9999' #with SSL connection
 Reg_addr = None #if None, Reg_addr = MAC address
 
-WEB_HOST = '0.0.0.0'
+WEB_HOST = '127.0.0.1'
 WEB_PORT = 80
 
 config_name = 'config.json'
@@ -147,29 +147,29 @@ def auto_push_switch():
         time.sleep(5)
         
 
-if '__main__' == __name__:
-    #killport(WEB_PORT)
 
-    DAN.profile['dm_name'] = 'SwitchAIO'
-    DAN.profile['d_name'] = 'TEST_SwitchAIO'
-    DAN.profile['df_list'] = idf_list + odf_list
+#killport(WEB_PORT)
 
-    open_config(config_name)
-    #DAN.profile['d_name']= 'Assign a Device Name' 
+DAN.profile['dm_name'] = 'SwitchAIO'
+#DAN.profile['d_name'] = 'TEST_SwitchAIO'
+DAN.profile['df_list'] = idf_list + odf_list
 
-    DAN.device_registration_with_retry(IOT_ServerURL, Reg_addr)
+open_config(config_name)
+#DAN.profile['d_name']= 'Assign a Device Name' 
 
-    t_auto_pull = threading.Thread(target=Auto_pull)
-    t_auto_pull.start()
+DAN.device_registration_with_retry(IOT_ServerURL, Reg_addr)
 
-    t_time_control = threading.Thread(target=auto_push_switch)
-    t_time_control.start()
+t_auto_pull = threading.Thread(target=Auto_pull)
+t_auto_pull.start()
 
-    atexit.register(on_exit)
+t_time_control = threading.Thread(target=auto_push_switch)
+t_time_control.start()
 
-    app.run(
-        host=WEB_HOST,
-        port=WEB_PORT,
-        threaded = True,
-        debug=False
-    )
+atexit.register(on_exit)
+
+app.run(
+    host=WEB_HOST,
+    port=WEB_PORT,
+    threaded = True,
+    debug=False
+)
