@@ -52,12 +52,18 @@ $(function(){
             'contentType': 'text/html'
         }).done(function (data) {
             data = JSON.parse(data);
-            console.log(data);
-            $('#Manual_mode').bootstrapToggle(data['Manual_mode']?'on':'off')
-            $('#switch').bootstrapToggle(data['switch']?'on':'off')
+            //console.log(data);
+            $('#Manual_mode').bootstrapToggle(data['Manual_mode']?'on':'off');
+            $('#switch').bootstrapToggle(data['switch']?'on':'off');
+            /*
             for(var k in data) {
                 $(`select[name=${k}]`).val(data[k]);
             }
+            */
+            $('#current_start_timeSet').text(data['start_hour'] + ' : ' + data['start_min']);
+            $('#current_end_timeSet').text(data['end_hour'] + ' : ' + data['end_min']);
+            //console.log(data['switch']);
+
             $('#Temperature1-O').text(data['Temperature1-O']);
             $('#Humidity1-O').text(data['Humidity1-O']);
 
