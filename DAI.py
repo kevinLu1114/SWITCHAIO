@@ -149,27 +149,28 @@ def auto_push_switch():
 
 
 #killport(WEB_PORT)
+if '__main__' == __name__:
 
-DAN.profile['dm_name'] = 'SwitchAIO'
-#DAN.profile['d_name'] = 'TEST_SwitchAIO'
-DAN.profile['df_list'] = idf_list + odf_list
+    DAN.profile['dm_name'] = 'SwitchAIO'
+    #DAN.profile['d_name'] = 'TEST_SwitchAIO'
+    DAN.profile['df_list'] = idf_list + odf_list
 
-open_config(config_name)
-#DAN.profile['d_name']= 'Assign a Device Name' 
+    open_config(config_name)
+    #DAN.profile['d_name']= 'Assign a Device Name' 
 
-DAN.device_registration_with_retry(IOT_ServerURL, Reg_addr)
+    DAN.device_registration_with_retry(IOT_ServerURL, Reg_addr)
 
-t_auto_pull = threading.Thread(target=Auto_pull)
-t_auto_pull.start()
+    t_auto_pull = threading.Thread(target=Auto_pull)
+    t_auto_pull.start()
 
-t_time_control = threading.Thread(target=auto_push_switch)
-t_time_control.start()
+    t_time_control = threading.Thread(target=auto_push_switch)
+    t_time_control.start()
 
-atexit.register(on_exit)
+    atexit.register(on_exit)
 
-app.run(
-    host=WEB_HOST,
-    port=WEB_PORT,
-    threaded = True,
-    debug=False
-)
+    app.run(
+        host=WEB_HOST,
+        port=WEB_PORT,
+        threaded = True,
+        debug=False
+    )
