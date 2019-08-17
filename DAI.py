@@ -50,7 +50,6 @@ data = {
 
 
 app = Flask(__name__)
-runmain = main()
 
 
 @app.route('/', methods=['GET'])
@@ -172,6 +171,7 @@ def main():
         debug=False
     )
 
+runmain = main()
 
 #killport(WEB_PORT)
 if '__main__' == __name__:
