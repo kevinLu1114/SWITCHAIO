@@ -50,6 +50,7 @@ data = {
 
 
 app = Flask(__name__)
+runmain = main()
 
 
 @app.route('/', methods=['GET'])
@@ -146,11 +147,7 @@ def auto_push_switch():
         DAN.push('Switch1', data['switch'])
         time.sleep(5)
         
-
-
-#killport(WEB_PORT)
-if '__main__' == __name__:
-
+def main():
     DAN.profile['dm_name'] = 'SwitchAIO'
     #DAN.profile['d_name'] = 'TEST_SwitchAIO'
     DAN.profile['df_list'] = idf_list + odf_list
@@ -174,3 +171,8 @@ if '__main__' == __name__:
         threaded = True,
         debug=False
     )
+
+
+#killport(WEB_PORT)
+if '__main__' == __name__:
+    main()
