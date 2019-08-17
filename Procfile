@@ -1,1 +1,2 @@
-web: gunicorn DAI:runmain
+web: gunicorn DAI:runmainpipenv shell
+worker

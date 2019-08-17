@@ -27,7 +27,7 @@ IOT_ServerURL = 'http://140.113.111.72:9999' #with SSL connection
 Reg_addr = None #if None, Reg_addr = MAC address
 
 WEB_HOST = '0.0.0.0'
-WEB_PORT = 80
+WEB_PORT = 9487
 
 config_name = 'config.json'
 idf_list = ['Switch1']
@@ -148,7 +148,7 @@ def auto_push_switch():
         
 def main():
     DAN.profile['dm_name'] = 'SwitchAIO'
-    #DAN.profile['d_name'] = 'TEST_SwitchAIO'
+    DAN.profile['d_name'] = 'TEST_SwitchAIO'
     DAN.profile['df_list'] = idf_list + odf_list
 
     open_config(config_name)
@@ -164,14 +164,13 @@ def main():
 
     atexit.register(on_exit)
 
+    
     app.run(
         host=WEB_HOST,
         port=WEB_PORT,
         threaded = True,
         debug=False
     )
-
-runmain = main()
 
 #killport(WEB_PORT)
 if '__main__' == __name__:
