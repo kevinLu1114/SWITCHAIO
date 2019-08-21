@@ -52,7 +52,7 @@ $(function(){
             'contentType': 'text/html'
         }).done(function (data) {
             data = JSON.parse(data);
-            console.log('switch', data['switch']);
+            console.log(data);
             $('#Manual_mode').prop('checked', data['Manual_mode']).change();
             $('#switch').prop('checked', data['switch']).change();
             //$('#Manual_mode').bootstrapToggle(?'on':'off');
@@ -70,6 +70,8 @@ $(function(){
 
             $('#Temperature1-O').text(data['Temperature1-O']);
             $('#Humidity1-O').text(data['Humidity1-O']);
+            $('#Temperature1-O_time').text(data['Temperature1-O_time']);
+            $('#Humidity1-O_time').text(data['Humidity1-O_time']);
 
         }).fail(function (data) {
             $('#Temperature1-O').text('None');

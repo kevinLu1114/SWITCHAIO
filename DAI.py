@@ -19,9 +19,9 @@ def Auto_pull():
             for odf in odf_list:
                 d = DAN.pull(odf)
                 if d != None:
+                    #print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S %p')-data[odf+'_time'])
+                    data[odf+'_time'] = datetime.datetime.now().strftime('%H:%M:%S %p')
                     odf_data[odf] = d[0]
-                else:
-                    odf_data[odf] = 'GG'
 
 IOT_ServerURL = 'http://140.113.111.72:9999' #with SSL connection
 Reg_addr = None #if None, Reg_addr = MAC address
@@ -39,13 +39,15 @@ odf_data = {'Humidity1-O':'GG', 'Temperature1-O':'GG'}
 
 data = {
     "Manual_mode":0,
-    "end_hour":15,
-    "end_min":32,
-    "max_Temperature":9,
-    "min_Humidity":23,
-    "start_hour":16,
-    "start_min":27,
-    "switch":0
+    "end_hour":17,
+    "end_min":20,
+    "max_Temperature":0,
+    "min_Humidity":-6,
+    "start_hour":17,
+    "start_min":0,
+    "switch":0,
+    "Humidity1-O_time": datetime.datetime.now().strftime('%H:%M:%S %p'),
+    "Temperature1-O_time":datetime.datetime.now().strftime('%H:%M:%S %p')
 }
 
 
@@ -147,6 +149,7 @@ def auto_push_switch():
         time.sleep(5)
         
 def main():
+    print(type(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S %p')))
     DAN.profile['dm_name'] = 'SwitchAIO'
     DAN.profile['d_name'] = 'TEST_SwitchAIO'
     DAN.profile['df_list'] = idf_list + odf_list
