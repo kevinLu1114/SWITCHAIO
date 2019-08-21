@@ -21,7 +21,7 @@ def Auto_pull():
                 if d != None:
                     #print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S %p')-data[odf+'_time'])
                     data[odf+'_time'] = datetime.datetime.now().strftime('%H:%M:%S %p')
-                    odf_data[odf] = d[0]
+                    odf_data[odf] = round(d[0], 2)
 
 IOT_ServerURL = 'http://140.113.111.72:9999' #with SSL connection
 Reg_addr = None #if None, Reg_addr = MAC address
